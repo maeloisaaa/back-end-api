@@ -28,3 +28,23 @@ app.get("/", async (req, res) => {
 app.listen(port, () => {
   console.log(`Serviço rodando na porta: ${port}`);
 });
+
+
+// Nova rota para retornar todas as questões cadastradas
+app.get("/questoes", async (req, res) => {
+  console.log("Rota GET /questoes solicitada");
+  const db = new Pool({
+    connectionString: process.env.URL_BD,
+  });
+  try {
+    const resultado = await db.query("SELECT * FROM questoes");
+    const dados = resultado.rows;
+    res.json(dados);
+  } catch (e) {
+    console.error("Erro ao buscar questões:", e);
+    res.status(500).json({
+      erro: "Erro interno do servidor",
+      mensagem: "Não foi possível buscar as questões",
+    });
+  }
+});
