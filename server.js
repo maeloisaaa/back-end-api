@@ -1,41 +1,50 @@
+import express from "express";
 import pkg from "pg";
 import dotenv from "dotenv";
-dotenv.config();         // Carrega e processa o arquivo .env
-const { Pool } = pkg;    // Utiliza a Classe Pool do Postgres
-import express from "express";
+
 const app = express();
 const port = 3000;
+dotenv.config();
+
+const { Pool } = pkg; 
+
+let pool = null; 
+
+function conectarBD() {
+  if (!pool) {
+    pool = new Pool({
+      connectionString: process.env.URL_BD,
+    });
+  }
+  return pool;
+}
 
 
 app.get("/", async (req, res) => {
   console.log("Rota GET / solicitada");
-  const db = new Pool({
-    connectionString: process.env.URL_BD,
-  });
+
+  const db = conectarBD();
+
   let dbStatus = "ok";
+
   try {
     await db.query("SELECT 1");
   } catch (e) {
     dbStatus = e.message;
   }
+
   res.json({
-    message: "API para controle de gastos pessoais",
-    author: "Maria Eloísa Costa Silva",
-    statusBD: dbStatus
+    message: "API para questões",
+    author: "Seu_nome_completo",
+    dbStatus: dbStatus,
   });
 });
 
-app.listen(port, () => {
-  console.log(`Serviço rodando na porta: ${port}`);
-});
-
-
-// Nova rota para retornar todas as questões cadastradas
 app.get("/questoes", async (req, res) => {
   console.log("Rota GET /questoes solicitada");
-  const db = new Pool({
-    connectionString: process.env.URL_BD,
-  });
+  
+  const db = conectarBD();
+
   try {
     const resultado = await db.query("SELECT * FROM questoes");
     const dados = resultado.rows;
@@ -47,4 +56,8 @@ app.get("/questoes", async (req, res) => {
       mensagem: "Não foi possível buscar as questões",
     });
   }
+});
+
+app.listen(port, () => {
+  console.log(`Serviço rodando na porta:  ${port}`);
 });
