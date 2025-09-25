@@ -35,7 +35,7 @@ app.get("/", async (req, res) => {
 
   res.json({
     message: "API para questões",
-    author: "Seu_nome_completo",
+    author: "Maria Eloísa Costa Silva",
     dbStatus: dbStatus,
   });
 });
